@@ -38,8 +38,8 @@ public class MainActivityFragment extends Fragment {
     private GridView gridView;
     private static final String POPULARITY_DESC = "popularity.desc";
     private static final String RATING_DESC = "vote_average.desc";
-    private ArrayList<Movie> moviesList;
-    private String sortBy = POPULARITY_DESC;
+    private ArrayList<Movie> moviesList = new ArrayList<Movie>();
+    private static String sortBy = POPULARITY_DESC;
 
     public MainActivityFragment() {
     }
@@ -47,11 +47,6 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(savedInstanceState == null || !savedInstanceState.containsKey("movies")) {
-            moviesList = new ArrayList<Movie>();
-        } else {
-            moviesList = savedInstanceState.getParcelableArrayList("movies");
-        }
         setHasOptionsMenu(true);
         String temp;
         if(savedInstanceState == null)
@@ -64,6 +59,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList("movies", moviesList);
+        outState.putString("sort_key",sortBy);
         super.onSaveInstanceState(outState);
     }
 
@@ -82,12 +78,13 @@ public class MainActivityFragment extends Fragment {
 
         switch (id) {
             case R.id.action_sort_by_popularity:
-                updateMovies(POPULARITY_DESC);
+                sortBy = POPULARITY_DESC;
                 break;
             case R.id.action_sort_by_rating:
-                updateMovies(RATING_DESC);
+                sortBy = RATING_DESC;
                 break;
         }
+        updateMovies(sortBy);
         return super.onOptionsItemSelected(item);
     }
 
@@ -97,20 +94,25 @@ public class MainActivityFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         movieAdapter = new MovieAdapter(getActivity(), moviesList);
-
         // Get a reference to the ListView, and attach this adapter to it.
         gridView = (GridView) rootView.findViewById(R.id.grid_view);
         gridView.setAdapter(movieAdapter);
 
-        Log.v("SORT",sortBy);
-        updateMovies(sortBy);
+        if(savedInstanceState != null && savedInstanceState.containsKey("movies") ) {
+                   moviesList = savedInstanceState.getParcelableArrayList("movies");
+            sortBy = savedInstanceState.getString("sort_key");
+            movieAdapter.addAll(moviesList);
+        }
+
+        Log.v("SORT", sortBy);
+        //updateMovies(sortBy);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 Movie movie = movieAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra("movie", (Parcelable) movie);
+                Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra("movie", movie);
                 startActivity(intent);
             }
         });
@@ -121,7 +123,7 @@ public class MainActivityFragment extends Fragment {
     public void onStart() {
         super.onStart();
         // Tried updating the movies from here and onCreateView no change
-        // updateMovies(sortBy);
+        updateMovies(sortBy);
     }
 
     private void updateMovies(String sortBy) {

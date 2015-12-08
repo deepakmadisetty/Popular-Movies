@@ -8,7 +8,7 @@ import java.util.ArrayList;
 /**
  * Created by Deepak on 12/3/15.
  */
-public class Movie extends ArrayList<Parcelable> implements Parcelable{
+public class Movie implements Parcelable{
 
     private int movieId;
     private String movieTitle;
