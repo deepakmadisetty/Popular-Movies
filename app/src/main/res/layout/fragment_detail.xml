@@ -1,0 +1,95 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.android.popularmovies.DetailActivityFragment"
+    tools:showIn="@layout/activity_detail">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:id="@+id/da_backdrop_image"
+                android:scaleType="centerCrop"
+                android:layout_gravity="center_horizontal|top" />
+
+            <ImageView
+                android:layout_width="124dp"
+                android:layout_height="160dp"
+                android:layout_marginTop="150dp"
+                android:layout_marginLeft="16dp"
+                android:id="@+id/da_poster_image"
+                android:scaleType="fitXY"
+                android:padding="1dp"
+                android:background="@android:color/white"
+                android:layout_gravity="left|bottom" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="208dp"
+                android:layout_height="116dp"
+                android:layout_gravity="right|bottom"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textStyle="bold"
+                    android:layout_margin="5dp"
+                    android:layout_gravity="left"
+                    android:id="@+id/da_movie_title"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_margin="5dp"
+                    android:layout_gravity="left"
+                    android:id="@+id/da_user_rating" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_margin="5dp"
+                    android:layout_gravity="left"
+                    android:id="@+id/da_release_date"/>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="10dp"
+            android:background="@android:color/darker_gray"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/da_overview_title"
+            android:text="@string/overview"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryDark"
+            android:paddingBottom="5dp"
+            android:layout_marginLeft="10dp" />
+        
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/da_overview"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textColor="@color/colorPrimary"
+            android:lineSpacingExtra="1dp"/>
+
+    </LinearLayout>
+
+</ScrollView>
