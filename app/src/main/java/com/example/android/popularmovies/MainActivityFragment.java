@@ -45,21 +45,23 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        // Tried updating the movies from here and onCreateView no change
+        updateMovies(sortBy);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         String temp;
-        if(savedInstanceState == null)
-            temp = "Null";
-        else
-            temp = "NotNull";
-        Log.v("SAVED", temp);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList("movies", moviesList);
-        outState.putString("sort_key",sortBy);
+        outState.putString("sort_key", sortBy);
         super.onSaveInstanceState(outState);
     }
 
@@ -88,6 +90,12 @@ public class MainActivityFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    private void updateMovies(String sortBy) {
+
+        FetchMoviesTask moviesTask = new FetchMoviesTask();
+        moviesTask.execute(sortBy);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -104,9 +112,6 @@ public class MainActivityFragment extends Fragment {
             movieAdapter.addAll(moviesList);
         }
 
-        Log.v("SORT", sortBy);
-        //updateMovies(sortBy);
-
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -119,62 +124,9 @@ public class MainActivityFragment extends Fragment {
         return rootView;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Tried updating the movies from here and onCreateView no change
-        updateMovies(sortBy);
-    }
-
-    private void updateMovies(String sortBy) {
-
-        FetchMoviesTask moviesTask = new FetchMoviesTask();
-        moviesTask.execute(sortBy);
-    }
-
     public class FetchMoviesTask extends AsyncTask<String, Void, List<Movie>> {
 
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
-
-        private List<Movie> getMovieDataFromJson(String movieJsonStr) throws JSONException {
-
-            // These are the names of the JSON objects that need to be extracted.
-            final String TMDB_RESULTS = "results";
-            final String TMDB_MOVIE_ID = "id";
-            final String TMDB_MOVIE_TITLE ="original_title";
-            final String TMDB_POSTER_PATH = "poster_path";
-            final String TMDB_BACKDROP_PATH = "backdrop_path";
-            final String TMDB_OVERVIEW = "overview";
-            final String TMDB_USER_RATING = "vote_average";
-            final String TMDB_RELEASE_DATE = "release_date";
-
-            int MOVIE_ID;
-            String MOVIE_TITLE, POSTER_PATH, BACKDROP_PATH, OVERVIEW, USER_RATING, RELEASE_DATE;
-
-            JSONObject movie = new JSONObject(movieJsonStr);
-            JSONArray movieArray = movie.getJSONArray(TMDB_RESULTS);
-
-            List<Movie> results = new ArrayList<>();
-            for (int i = 0; i < movieArray.length(); i++) {
-
-                // Get the JSON object representing each Movie
-                JSONObject movieResult = movieArray.getJSONObject(i);
-
-                MOVIE_ID =movieResult.getInt(TMDB_MOVIE_ID);
-                MOVIE_TITLE = movieResult.getString(TMDB_MOVIE_TITLE);
-                POSTER_PATH = movieResult.getString(TMDB_POSTER_PATH);
-                BACKDROP_PATH = movieResult.getString(TMDB_BACKDROP_PATH);
-                OVERVIEW = movieResult.getString(TMDB_OVERVIEW);
-                USER_RATING = movieResult.getString(TMDB_USER_RATING);
-                RELEASE_DATE = movieResult.getString(TMDB_RELEASE_DATE);
-
-                Movie movieModel = new Movie(MOVIE_ID, MOVIE_TITLE, POSTER_PATH, BACKDROP_PATH, OVERVIEW, USER_RATING, RELEASE_DATE);
-
-                results.add(movieModel);
-
-            }
-            return results;
-        }
 
         @Override
         protected List<Movie> doInBackground(String... params) {
@@ -194,13 +146,17 @@ public class MainActivityFragment extends Fragment {
             try {
 
                 final String MOVIES_BASE_URL =
-                        "http://api.themoviedb.org/3/discover/movie?";
+                        "https://api.themoviedb.org/3/discover/movie?";
                 final String SORTING_PARAM = "sort_by";
                 final String API_KEY_PARAM = "api_key";
+                final String VOTE_PARAM = "vote_count.gte";
+
+                final String minimumVotes = "100";
 
                 Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon()
                         .appendQueryParameter(SORTING_PARAM, params[0])
                         .appendQueryParameter(API_KEY_PARAM, BuildConfig.MOVIE_DATABASE_API_KEY)
+                        .appendQueryParameter(VOTE_PARAM,minimumVotes)
                         .build();
 
                 URL url = new URL(builtUri.toString());
@@ -257,6 +213,46 @@ public class MainActivityFragment extends Fragment {
 
             // This will only happen if there was an error getting or parsing the forecast.
             return null;
+        }
+
+        private List<Movie> getMovieDataFromJson(String movieJsonStr) throws JSONException {
+
+            // These are the names of the JSON objects that need to be extracted.
+            final String TMDB_RESULTS = "results";
+            final String TMDB_MOVIE_ID = "id";
+            final String TMDB_MOVIE_TITLE ="original_title";
+            final String TMDB_POSTER_PATH = "poster_path";
+            final String TMDB_BACKDROP_PATH = "backdrop_path";
+            final String TMDB_OVERVIEW = "overview";
+            final String TMDB_USER_RATING = "vote_average";
+            final String TMDB_RELEASE_DATE = "release_date";
+
+            int MOVIE_ID;
+            String MOVIE_TITLE, POSTER_PATH, BACKDROP_PATH, OVERVIEW, USER_RATING, RELEASE_DATE;
+
+            JSONObject movie = new JSONObject(movieJsonStr);
+            JSONArray movieArray = movie.getJSONArray(TMDB_RESULTS);
+
+            List<Movie> results = new ArrayList<>();
+            for (int i = 0; i < movieArray.length(); i++) {
+
+                // Get the JSON object representing each Movie
+                JSONObject movieResult = movieArray.getJSONObject(i);
+
+                MOVIE_ID =movieResult.getInt(TMDB_MOVIE_ID);
+                MOVIE_TITLE = movieResult.getString(TMDB_MOVIE_TITLE);
+                POSTER_PATH = movieResult.getString(TMDB_POSTER_PATH);
+                BACKDROP_PATH = movieResult.getString(TMDB_BACKDROP_PATH);
+                OVERVIEW = movieResult.getString(TMDB_OVERVIEW);
+                USER_RATING = movieResult.getString(TMDB_USER_RATING);
+                RELEASE_DATE = movieResult.getString(TMDB_RELEASE_DATE);
+
+                Movie movieModel = new Movie(MOVIE_ID, MOVIE_TITLE, POSTER_PATH, BACKDROP_PATH, OVERVIEW, USER_RATING, RELEASE_DATE);
+
+                results.add(movieModel);
+
+            }
+            return results;
         }
 
         @Override
