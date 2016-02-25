@@ -1,14 +1,12 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.example.android.popularmovies.DetailActivityFragment"
-    tools:showIn="@layout/activity_detail">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -47,6 +45,7 @@
                     android:layout_margin="5dp"
                     android:layout_gravity="left"
                     android:id="@+id/da_movie_title"/>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -54,6 +53,7 @@
                     android:layout_margin="5dp"
                     android:layout_gravity="left"
                     android:id="@+id/da_user_rating" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -61,9 +61,7 @@
                     android:layout_margin="5dp"
                     android:layout_gravity="left"
                     android:id="@+id/da_release_date"/>
-
             </LinearLayout>
-
         </FrameLayout>
 
         <View
@@ -71,6 +69,7 @@
             android:layout_height="1dp"
             android:layout_margin="10dp"
             android:background="@android:color/darker_gray"/>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -89,7 +88,5 @@
             android:layout_marginRight="10dp"
             android:textColor="@color/colorPrimary"
             android:lineSpacingExtra="1dp"/>
-
     </LinearLayout>
-
 </ScrollView>
