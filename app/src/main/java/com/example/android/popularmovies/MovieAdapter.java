@@ -48,6 +48,8 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
 
         Picasso.with(mContext)
                 .load(image_url)
+                .placeholder(R.drawable.poster_placeholder)
+                .error(R.drawable.error_poster_placeholder)
                 .into(imageView);
         return convertView;
     }

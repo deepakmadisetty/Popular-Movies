@@ -11,12 +11,19 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * A placeholder fragment containing a simple view.
  */
 public class DetailActivityFragment extends Fragment {
 
     private Movie movie;
+    @Bind(R.id.da_movie_title) TextView movieTitle;
+    @Bind(R.id.da_user_rating) TextView userRating;
+    @Bind(R.id.da_release_date) TextView releaseDate;
+    @Bind(R.id.da_overview) TextView overview;
 
     public DetailActivityFragment() {
     }
@@ -37,14 +44,18 @@ public class DetailActivityFragment extends Fragment {
         String backdropImageURL = "http://image.tmdb.org/t/p/w500/"+movie.getBackdropImage();
         String posterImageURL = "http://image.tmdb.org/t/p/w185/"+movie.getPosterImage();
 
-        Picasso.with(getContext()).load(backdropImageURL).into(backdropImage);
-        Picasso.with(getContext()).load(posterImageURL).into(posterImage);
+        Picasso.with(getContext())
+                .load(backdropImageURL)
+                .placeholder(R.drawable.backdrop_placholder)
+                .error(R.drawable.error_backdrop_placeholder)
+                .into(backdropImage);
+        Picasso.with(getContext())
+                .load(posterImageURL)
+                .placeholder(R.drawable.poster_placeholder)
+                .error(R.drawable.error_poster_placeholder)
+                .into(posterImage);
 
-        TextView movieTitle = (TextView) rootView.findViewById(R.id.da_movie_title);
-        TextView userRating = (TextView) rootView.findViewById(R.id.da_user_rating);
-        TextView releaseDate = (TextView) rootView.findViewById(R.id.da_release_date);
-        TextView overview = (TextView) rootView.findViewById(R.id.da_overview);
-
+        ButterKnife.bind(this, rootView);
         movieTitle.setText(movie.getMovieTitle());
         userRating.setText("User Rating: "+ movie.getUserRating());
         releaseDate.setText("Release Date: " + movie.getReleaseDate());
