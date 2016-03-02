@@ -4,8 +4,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.example.android.popularmovies.adapters.TrailerAdapter;
-import com.example.android.popularmovies.models.Trailer;
+import com.example.android.popularmovies.adapters.ReviewAdapter;
+import com.example.android.popularmovies.models.Review;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,35 +23,35 @@ import java.util.List;
 /**
  * Created by Deepak on 3/2/16.
  */
-public class FetchTrailersTask extends AsyncTask<String, Void, List<Trailer>> {
+public class FetchReviewsTask extends AsyncTask<String, Void, List<Review>> {
 
-    private TrailerAdapter trailerAdapter;
+    public ReviewAdapter reviewAdapter;
 
-    public FetchTrailersTask(TrailerAdapter trailerAdapter) {
-        this.trailerAdapter = trailerAdapter;
+    public FetchReviewsTask(ReviewAdapter reviewAdapter) {
+        this.reviewAdapter = reviewAdapter;
     }
 
     private final String LOG_TAG = FetchTrailersTask.class.getSimpleName();
 
-    final String TMDB_TRAILER_RESULTS = "results";
+    final String TMDB_REVIEW_RESULTS = "results";
 
-    private List<Trailer> getTrailerDataFromJson(String trailerJsonStr) throws JSONException {
+    private List<Review> getReviewDataFromJson(String reviewJsonStr) throws JSONException {
 
-        JSONObject trailerObject = new JSONObject(trailerJsonStr);
-        JSONArray trailerArray = trailerObject.getJSONArray(TMDB_TRAILER_RESULTS);
+        JSONObject reviewObject = new JSONObject(reviewJsonStr);
+        JSONArray reviewArray = reviewObject.getJSONArray(TMDB_REVIEW_RESULTS);
 
-        List<Trailer> results = new ArrayList<>();
-        for (int i = 0; i < trailerArray.length(); i++) {
-            JSONObject trailerResult = trailerArray.getJSONObject(i);
-            Trailer trailerModel = new Trailer(trailerResult);
-            results.add(trailerModel);
+        List<Review> results = new ArrayList<>();
+        for (int i = 0; i < reviewArray.length(); i++) {
+            JSONObject reviewResult = reviewArray.getJSONObject(i);
+            Review reviewModel = new Review(reviewResult);
+            results.add(reviewModel);
         }
 
         return results;
     }
 
     @Override
-    protected List<Trailer> doInBackground(String... params) {
+    protected List<Review> doInBackground(String... params) {
         if (params.length == 0) {
             return null;
         }
@@ -62,15 +62,15 @@ public class FetchTrailersTask extends AsyncTask<String, Void, List<Trailer>> {
         BufferedReader reader = null;
 
         // Will contain the raw JSON response as a string.
-        String trailerJsonStr = null;
+        String reviewJsonStr = null;
 
         try {
 
-            final String TRAILERS_BASE_URL =
-                    "http://api.themoviedb.org/3/movie/" + params[0] + "/videos";;
+            final String REVIEWS_BASE_URL =
+                    "http://api.themoviedb.org/3/movie/" + params[0] + "/reviews";;
             final String API_KEY_PARAM = "api_key";
 
-            Uri builtUri = Uri.parse(TRAILERS_BASE_URL).buildUpon()
+            Uri builtUri = Uri.parse(REVIEWS_BASE_URL).buildUpon()
                     .appendQueryParameter(API_KEY_PARAM, BuildConfig.MOVIE_DATABASE_API_KEY)
                     .build();
 
@@ -100,7 +100,7 @@ public class FetchTrailersTask extends AsyncTask<String, Void, List<Trailer>> {
                 // Stream was empty.  No point in parsing.
                 return null;
             }
-            trailerJsonStr = buffer.toString();
+            reviewJsonStr = buffer.toString();
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attemping
@@ -120,7 +120,7 @@ public class FetchTrailersTask extends AsyncTask<String, Void, List<Trailer>> {
         }
 
         try {
-            return getTrailerDataFromJson(trailerJsonStr);
+            return getReviewDataFromJson(reviewJsonStr);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -131,10 +131,10 @@ public class FetchTrailersTask extends AsyncTask<String, Void, List<Trailer>> {
     }
 
     @Override
-    protected void onPostExecute(List<Trailer> trailers) {
-        if (trailers != null) {
-            trailerAdapter.clear();
-            trailerAdapter.addAll(trailers);
+    protected void onPostExecute(List<Review> reviews) {
+        if (reviews != null) {
+            reviewAdapter.clear();
+            reviewAdapter.addAll(reviews);
         }
     }
 }
