@@ -28,9 +28,6 @@ public class MainActivityFragment extends Fragment {
     private ArrayList<Movie> moviesList = new ArrayList<Movie>();
     private static String sortBy = POPULARITY_DESC;
 
-    public MainActivityFragment() {
-    }
-
     @Override
     public void onStart() {
         super.onStart();
