@@ -35,6 +35,7 @@ dependencies {
     compile 'com.jakewharton:butterknife:7.0.1'
     compile files('/Users/Deepak/AndroidStudioProjects/PopularMovies/Libs/picasso-2.5.2.jar')
     compile files('/Users/Deepak/AndroidStudioProjects/PopularMovies/Libs/retrofit-2.0.0-beta2.jar')
+    compile 'com.github.frankiesardo:linearlistview:1.0.1@aar'
 }
 
 repositories {

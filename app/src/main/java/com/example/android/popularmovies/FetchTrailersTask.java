@@ -5,7 +5,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.android.popularmovies.adapters.MovieAdapter;
-import com.example.android.popularmovies.models.Movie;
+import com.example.android.popularmovies.adapters.TrailerAdapter;
+import com.example.android.popularmovies.models.Trailer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,60 +22,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Deepak on 12/9/15.
+ * Created by Deepak on 3/2/16.
  */
-public class FetchMoviesTask extends AsyncTask<String, Void, List<Movie>> {
+public class FetchTrailersTask extends AsyncTask<String, Void, List<Trailer>> {
 
-    private MovieAdapter movieAdapter;
-    public FetchMoviesTask(MovieAdapter movieAdapter) {
-        this.movieAdapter = movieAdapter;
+    private TrailerAdapter trailerAdapter;
+
+    public FetchTrailersTask(TrailerAdapter trailerAdapter) {
+        this.trailerAdapter = trailerAdapter;
     }
 
-    private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
+    private final String LOG_TAG = FetchTrailersTask.class.getSimpleName();
 
-    private List<Movie> getMovieDataFromJson(String movieJsonStr) throws JSONException {
+    final String TMDB_TRAILER_RESULTS = "results";
 
-        // These are the names of the JSON objects that need to be extracted.
-        final String TMDB_RESULTS = "results";
-        final String TMDB_MOVIE_ID = "id";
-        final String TMDB_MOVIE_TITLE ="original_title";
-        final String TMDB_POSTER_PATH = "poster_path";
-        final String TMDB_BACKDROP_PATH = "backdrop_path";
-        final String TMDB_OVERVIEW = "overview";
-        final String TMDB_USER_RATING = "vote_average";
-        final String TMDB_RELEASE_DATE = "release_date";
+    private List<Trailer> getTrailerDataFromJson(String trailerJsonStr) throws JSONException {
 
-        int MOVIE_ID;
-        String MOVIE_TITLE, POSTER_PATH, BACKDROP_PATH, OVERVIEW, USER_RATING, RELEASE_DATE;
+        JSONObject trailerObject = new JSONObject(trailerJsonStr);
+        JSONArray trailerArray = trailerObject.getJSONArray(TMDB_TRAILER_RESULTS);
 
-        JSONObject movieObject = new JSONObject(movieJsonStr);
-        JSONArray movieArray = movieObject.getJSONArray(TMDB_RESULTS);
-
-        List<Movie> results = new ArrayList<>();
-        for (int i = 0; i < movieArray.length(); i++) {
-
-            // Get the JSON object representing each Movie
-            JSONObject movieResult = movieArray.getJSONObject(i);
-
-            MOVIE_ID =movieResult.getInt(TMDB_MOVIE_ID);
-            MOVIE_TITLE = movieResult.getString(TMDB_MOVIE_TITLE);
-            POSTER_PATH = movieResult.getString(TMDB_POSTER_PATH);
-            BACKDROP_PATH = movieResult.getString(TMDB_BACKDROP_PATH);
-            OVERVIEW = movieResult.getString(TMDB_OVERVIEW);
-            USER_RATING = movieResult.getString(TMDB_USER_RATING);
-            RELEASE_DATE = movieResult.getString(TMDB_RELEASE_DATE);
-
-            Movie movieModel = new Movie(MOVIE_ID, MOVIE_TITLE, POSTER_PATH, BACKDROP_PATH, OVERVIEW, USER_RATING, RELEASE_DATE);
-
-            results.add(movieModel);
-
+        List<Trailer> results = new ArrayList<>();
+        for (int i = 0; i < trailerArray.length(); i++) {
+            JSONObject trailerResult = trailerArray.getJSONObject(i);
+            Trailer trailerModel = new Trailer(trailerResult);
+            results.add(trailerModel);
         }
+
         return results;
     }
 
     @Override
-    protected List<Movie> doInBackground(String... params) {
-
+    protected List<Trailer> doInBackground(String... params) {
         if (params.length == 0) {
             return null;
         }
@@ -85,22 +63,16 @@ public class FetchMoviesTask extends AsyncTask<String, Void, List<Movie>> {
         BufferedReader reader = null;
 
         // Will contain the raw JSON response as a string.
-        String movieJsonStr = null;
+        String trailerJsonStr = null;
 
         try {
 
-            final String MOVIES_BASE_URL =
-                    "https://api.themoviedb.org/3/discover/movie?";
-            final String SORTING_PARAM = "sort_by";
+            final String TRAILERS_BASE_URL =
+                    "http://api.themoviedb.org/3/movie/" + params[0] + "/videos";;
             final String API_KEY_PARAM = "api_key";
-            final String VOTE_PARAM = "vote_count.gte";
 
-            final String minimumVotes = "100";
-
-            Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon()
-                    .appendQueryParameter(SORTING_PARAM, params[0])
+            Uri builtUri = Uri.parse(TRAILERS_BASE_URL).buildUpon()
                     .appendQueryParameter(API_KEY_PARAM, BuildConfig.MOVIE_DATABASE_API_KEY)
-                    .appendQueryParameter(VOTE_PARAM,minimumVotes)
                     .build();
 
             URL url = new URL(builtUri.toString());
@@ -129,7 +101,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, List<Movie>> {
                 // Stream was empty.  No point in parsing.
                 return null;
             }
-            movieJsonStr = buffer.toString();
+            trailerJsonStr = buffer.toString();
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attemping
@@ -149,7 +121,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, List<Movie>> {
         }
 
         try {
-            return getMovieDataFromJson(movieJsonStr);
+            return getTrailerDataFromJson(trailerJsonStr);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -160,11 +132,10 @@ public class FetchMoviesTask extends AsyncTask<String, Void, List<Movie>> {
     }
 
     @Override
-    protected void onPostExecute(List<Movie> movies) {
-        if (movies != null) {
-            movieAdapter.clear();
-            movieAdapter.addAll(movies);
+    protected void onPostExecute(List<Trailer> trailers) {
+        if (trailers != null) {
+            trailerAdapter.clear();
+            trailerAdapter.addAll(trailers);
         }
     }
 }
-
