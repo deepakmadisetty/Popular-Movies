@@ -1,5 +1,6 @@
 package com.example.android.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
@@ -7,11 +8,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.popularmovies.adapters.ReviewAdapter;
 import com.example.android.popularmovies.adapters.TrailerAdapter;
+import com.example.android.popularmovies.data.MovieContract;
 import com.example.android.popularmovies.models.Movie;
 import com.example.android.popularmovies.models.Review;
 import com.example.android.popularmovies.models.Trailer;
@@ -38,7 +42,7 @@ public class DetailActivityFragment extends Fragment {
     @Bind(R.id.da_user_rating) TextView userRating;
     @Bind(R.id.da_release_date) TextView releaseDate;
     @Bind(R.id.da_overview) TextView overview;
-
+    @Bind(R.id.star) CheckBox checkBox;
     public DetailActivityFragment() {
     }
 
@@ -83,6 +87,35 @@ public class DetailActivityFragment extends Fragment {
         releaseDate.setText("Release Date: " + movie.getReleaseDate());
         overview.setText(movie.getOverview());
 
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int isFavourite = Utility.isFavorite(getActivity(), movie.getMovieId());
+
+                if (isFavourite == 1) {
+                    getActivity().getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI,
+                            MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
+                            new String[]{Integer.toString(movie.getMovieId())}
+                    );
+                    Toast toast = Toast.makeText(getActivity(), "Removed from Favourites", Toast.LENGTH_SHORT);
+                    toast.show();
+                } else {
+                    ContentValues values = new ContentValues();
+                    values.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie.getMovieId());
+                    values.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, movie.getMovieTitle());
+                    values.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movie.getPosterImage());
+                    values.put(MovieContract.MovieEntry.COLUMN_BACKDROP_PATH, movie.getBackdropImage());
+                    values.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
+                    values.put(MovieContract.MovieEntry.COLUMN_USER_RATING, movie.getUserRating());
+                    values.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+
+                    getActivity().getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, values);
+                    Toast toast = Toast.makeText(getActivity(), "Added to Favourites", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+        });
+
         trailerAdapter = new TrailerAdapter(getActivity(), trailerList);
 
         LinearListView trailerListView = (LinearListView) rootView.findViewById(R.id.trailer_list_view);
@@ -115,6 +148,5 @@ public class DetailActivityFragment extends Fragment {
         FetchReviewsTask reviewsTask = new FetchReviewsTask(reviewAdapter);
         reviewsTask.execute(Integer.toString(movie.getMovieId()));
     }
-
 
 }

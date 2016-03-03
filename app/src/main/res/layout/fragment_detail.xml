@@ -1,4 +1,5 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -35,14 +36,15 @@
                 android:layout_height="116dp"
                 android:layout_gravity="right|bottom"
                 android:layout_marginRight="5dp"
-                android:layout_marginLeft="5dp">
+                android:layout_marginLeft="5dp"
+                android:weightSum="4">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorPrimaryDark"
                     android:textStyle="bold"
-                    android:layout_margin="5dp"
+                    android:layout_margin="3dp"
                     android:layout_gravity="left"
                     android:id="@+id/da_movie_title"/>
 
@@ -50,7 +52,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorPrimary"
-                    android:layout_margin="5dp"
+                    android:layout_margin="3dp"
                     android:layout_gravity="left"
                     android:id="@+id/da_user_rating" />
 
@@ -58,9 +60,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorPrimary"
-                    android:layout_margin="5dp"
                     android:layout_gravity="left"
+                    android:layout_margin="3dp"
                     android:id="@+id/da_release_date"/>
+
+                <CheckBox android:id="@+id/star"
+                    style="?android:attr/starStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mark as Favourite"
+                    android:onClick="onCheckboxClicked"
+                    />
             </LinearLayout>
         </FrameLayout>
 
@@ -107,10 +117,6 @@
                 android:textColor="@color/colorPrimaryDark"
                 android:paddingBottom="10dp" />
 
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-
                 <com.linearlistview.LinearListView
                     xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/trailer_list_view"
@@ -121,7 +127,6 @@
                     app:dividerThickness="1dp"
                     android:orientation="vertical"
                     android:showDividers="middle" />
-            </HorizontalScrollView>
         </LinearLayout>
         <View
             android:layout_width="match_parent"

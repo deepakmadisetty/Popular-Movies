@@ -10,7 +10,7 @@ import android.provider.BaseColumns;
  */
 public class MovieContract {
 
-    public static final String CONTENT_AUTHORITY = "com.example.android.popularmovies.data";
+    public static final String CONTENT_AUTHORITY = "com.example.android.popularmovies.app";
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
@@ -27,7 +27,6 @@ public class MovieContract {
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
 
         public static final String TABLE_NAME = "movies";
-        public static final String _ID = "id";
         public static final String COLUMN_MOVIE_ID = "id";
         public static final String COLUMN_MOVIE_TITLE ="original_title";
         public static final String COLUMN_POSTER_PATH = "poster_path";
