@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.models.Movie;
@@ -47,6 +48,7 @@ public class TrailerAdapter extends ArrayAdapter<Trailer> {
         //ImageView iconView = (ImageView) convertView.findViewById(R.id.movie_image);
 
         ImageView imageView = (ImageView) convertView.findViewById(R.id.trailer_image);
+        TextView textView = (TextView) convertView.findViewById(R.id.trailer_text);
 
         String image_url = "http://img.youtube.com/vi/"+trailer.getKey()+ "/0.jpg";
 
@@ -55,6 +57,8 @@ public class TrailerAdapter extends ArrayAdapter<Trailer> {
                 .placeholder(R.drawable.poster_placeholder)
                 .error(R.drawable.error_poster_placeholder)
                 .into(imageView);
+
+        textView.setText(trailer.getName());
         return convertView;
     }
 }

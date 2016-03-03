@@ -1,13 +1,10 @@
 package com.example.android.popularmovies;
 
-import android.content.ContentValues;
-import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.android.popularmovies.adapters.MovieAdapter;
-import com.example.android.popularmovies.data.MovieContract;
 import com.example.android.popularmovies.models.Movie;
 
 import org.json.JSONArray;
@@ -22,21 +19,20 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Created by Deepak on 12/9/15.
  */
-public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
+public class FetchMoviesTask extends AsyncTask<String, Void, List<Movie>> {
 
-    private final Context mContext;
-    public FetchMoviesTask(Context context) {
-        this.mContext = context;
+    private MovieAdapter movieAdapter;
+    public FetchMoviesTask(MovieAdapter movieAdapter) {
+        this.movieAdapter = movieAdapter;
     }
 
     private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
 
-    private void getMovieDataFromJson(String movieJsonStr) throws JSONException {
+    private List<Movie> getMovieDataFromJson(String movieJsonStr) throws JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
         final String TMDB_RESULTS = "results";
@@ -48,57 +44,36 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
         final String TMDB_USER_RATING = "vote_average";
         final String TMDB_RELEASE_DATE = "release_date";
 
-        String MOVIE_ID;
+        int MOVIE_ID;
         String MOVIE_TITLE, POSTER_PATH, BACKDROP_PATH, OVERVIEW, USER_RATING, RELEASE_DATE;
 
-        try {
-            JSONObject movieObject = new JSONObject(movieJsonStr);
-            JSONArray movieArray = movieObject.getJSONArray(TMDB_RESULTS);
+        JSONObject movieObject = new JSONObject(movieJsonStr);
+        JSONArray movieArray = movieObject.getJSONArray(TMDB_RESULTS);
 
-            Vector<ContentValues> cVVector = new Vector<ContentValues>(movieArray.length());
+        List<Movie> results = new ArrayList<>();
+        for (int i = 0; i < movieArray.length(); i++) {
 
-            for (int i = 0; i < movieArray.length(); i++) {
+            // Get the JSON object representing each Movie
+            JSONObject movieResult = movieArray.getJSONObject(i);
 
-                // Get the JSON object representing each Movie
-                JSONObject movieResult = movieArray.getJSONObject(i);
+            MOVIE_ID =movieResult.getInt(TMDB_MOVIE_ID);
+            MOVIE_TITLE = movieResult.getString(TMDB_MOVIE_TITLE);
+            POSTER_PATH = movieResult.getString(TMDB_POSTER_PATH);
+            BACKDROP_PATH = movieResult.getString(TMDB_BACKDROP_PATH);
+            OVERVIEW = movieResult.getString(TMDB_OVERVIEW);
+            USER_RATING = movieResult.getString(TMDB_USER_RATING);
+            RELEASE_DATE = movieResult.getString(TMDB_RELEASE_DATE);
 
-                ContentValues contentValues = new ContentValues();
+            Movie movieModel = new Movie(MOVIE_ID, MOVIE_TITLE, POSTER_PATH, BACKDROP_PATH, OVERVIEW, USER_RATING, RELEASE_DATE);
 
-                MOVIE_ID =movieResult.getString(TMDB_MOVIE_ID);
-                MOVIE_TITLE = movieResult.getString(TMDB_MOVIE_TITLE);
-                POSTER_PATH = movieResult.getString(TMDB_POSTER_PATH);
-                BACKDROP_PATH = movieResult.getString(TMDB_BACKDROP_PATH);
-                OVERVIEW = movieResult.getString(TMDB_OVERVIEW);
-                USER_RATING = movieResult.getString(TMDB_USER_RATING);
-                RELEASE_DATE = movieResult.getString(TMDB_RELEASE_DATE);
+            results.add(movieModel);
 
-                contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID,MOVIE_ID);
-                contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, MOVIE_TITLE);
-                contentValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH,POSTER_PATH);
-                contentValues.put(MovieContract.MovieEntry.COLUMN_BACKDROP_PATH,BACKDROP_PATH);
-                contentValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, OVERVIEW);
-                contentValues.put(MovieContract.MovieEntry.COLUMN_USER_RATING, USER_RATING);
-                contentValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, RELEASE_DATE);
-
-                cVVector.add(contentValues);
-            }
-            int inserted = 0;
-            if ( cVVector.size() > 0 ) {
-                ContentValues[] cvArray = new ContentValues[cVVector.size()];
-                cVVector.toArray(cvArray);
-                inserted = mContext.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
-            }
-
-            Log.d(LOG_TAG, "FetchWeatherTask Complete. " + inserted + " Inserted");
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
         }
-
+        return results;
     }
 
     @Override
-    protected Void doInBackground(String... params) {
+    protected List<Movie> doInBackground(String... params) {
 
         if (params.length == 0) {
             return null;
@@ -155,15 +130,11 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
                 return null;
             }
             movieJsonStr = buffer.toString();
-            getMovieDataFromJson(movieJsonStr);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attemping
             // to parse it.
             return null;
-        }catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -176,8 +147,24 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
                 }
             }
         }
+
+        try {
+            return getMovieDataFromJson(movieJsonStr);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+        }
+
         // This will only happen if there was an error getting or parsing the forecast.
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(List<Movie> movies) {
+        if (movies != null) {
+            movieAdapter.clear();
+            movieAdapter.addAll(movies);
+        }
     }
 }
 
