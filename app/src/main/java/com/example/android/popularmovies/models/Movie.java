@@ -4,7 +4,7 @@ import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.example.android.popularmovies.MainActivityFragment;
+import com.example.android.popularmovies.MoviesFragment;
 
 /**
  * Created by Deepak on 12/3/15.
@@ -30,13 +30,13 @@ public class Movie implements Parcelable{
     }
 
     public Movie(Cursor cursor) {
-        this.movieId = cursor.getInt(MainActivityFragment.COL_MOVIE_ID);
-        this.movieTitle = cursor.getString(MainActivityFragment.COL_MOVIE_TITLE);
-        this.posterImage = cursor.getString(MainActivityFragment.COL_POSTER_IMAGE);
-        this.backdropImage = cursor.getString(MainActivityFragment.COL_BACKDROP_IMAGE);
-        this.overview = cursor.getString(MainActivityFragment.COL_OVERVIEW);
-        this.userRating = cursor.getString(MainActivityFragment.COL_USER_RATING);
-        this.releaseDate = cursor.getString(MainActivityFragment.COL_RELEASE_DATE);
+        this.movieId = cursor.getInt(MoviesFragment.COL_MOVIE_ID);
+        this.movieTitle = cursor.getString(MoviesFragment.COL_MOVIE_TITLE);
+        this.posterImage = cursor.getString(MoviesFragment.COL_POSTER_IMAGE);
+        this.backdropImage = cursor.getString(MoviesFragment.COL_BACKDROP_IMAGE);
+        this.overview = cursor.getString(MoviesFragment.COL_OVERVIEW);
+        this.userRating = cursor.getString(MoviesFragment.COL_USER_RATING);
+        this.releaseDate = cursor.getString(MoviesFragment.COL_RELEASE_DATE);
     }
 
     public int getMovieId() {
