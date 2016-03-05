@@ -5,7 +5,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -32,18 +37,48 @@ import butterknife.ButterKnife;
  */
 public class DetailActivityFragment extends Fragment {
 
+    private Toast mToast;
+
+
     private Movie movie;
+    private String TRAILER_KEY;
     private TrailerAdapter trailerAdapter;
     private ReviewAdapter reviewAdapter;
     private ArrayList<Trailer> trailerList = new ArrayList<Trailer>();
     private ArrayList<Review> reviewList = new ArrayList<Review>();
+    ShareActionProvider mShareActionProvider;
 
     @Bind(R.id.da_movie_title) TextView movieTitle;
     @Bind(R.id.da_user_rating) TextView userRating;
     @Bind(R.id.da_release_date) TextView releaseDate;
     @Bind(R.id.da_overview) TextView overview;
-    @Bind(R.id.star) CheckBox checkBox;
+    @Bind(R.id.favorite) CheckBox checkBox;
     public DetailActivityFragment() {
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.menu_detail, menu);
+
+        MenuItem menuShareItem = menu.findItem(R.id.action_share);
+
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuShareItem);
+
+        if(mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(createShareMovieIntent());
+        }
+    }
+
+    private Intent createShareMovieIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, movie.getMovieTitle() + " " +
+                "http://www.youtube.com/watch?v=" + TRAILER_KEY);
+        return shareIntent;
     }
 
     @Override
@@ -87,31 +122,39 @@ public class DetailActivityFragment extends Fragment {
         releaseDate.setText("Release Date: " + movie.getReleaseDate());
         overview.setText(movie.getOverview());
 
+        int isFavourite = Utility.isFavorite(getActivity(), movie.getMovieId());
+        if(isFavourite == 1)
+            checkBox.setChecked(true);
+
+
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int isFavourite = Utility.isFavorite(getActivity(), movie.getMovieId());
 
-                if (isFavourite == 1) {
-                    getActivity().getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI,
-                            MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
-                            new String[]{Integer.toString(movie.getMovieId())}
-                    );
-                    Toast toast = Toast.makeText(getActivity(), "Removed from Favourites", Toast.LENGTH_SHORT);
-                    toast.show();
-                } else {
-                    ContentValues values = new ContentValues();
-                    values.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie.getMovieId());
-                    values.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, movie.getMovieTitle());
-                    values.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movie.getPosterImage());
-                    values.put(MovieContract.MovieEntry.COLUMN_BACKDROP_PATH, movie.getBackdropImage());
-                    values.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
-                    values.put(MovieContract.MovieEntry.COLUMN_USER_RATING, movie.getUserRating());
-                    values.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+                if (movie != null) {
+                    int isFavourite = Utility.isFavorite(getActivity(), movie.getMovieId());
 
-                    getActivity().getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, values);
-                    Toast toast = Toast.makeText(getActivity(), "Added to Favourites", Toast.LENGTH_SHORT);
-                    toast.show();
+                    if (isFavourite == 1) {
+                        getActivity().getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI,
+                                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
+                                new String[]{Integer.toString(movie.getMovieId())}
+                        );
+                        Toast toast = Toast.makeText(getActivity(), "Removed from Favourites", Toast.LENGTH_SHORT);
+                        toast.show();
+                    } else {
+                        ContentValues values = new ContentValues();
+                        values.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie.getMovieId());
+                        values.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, movie.getMovieTitle());
+                        values.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movie.getPosterImage());
+                        values.put(MovieContract.MovieEntry.COLUMN_BACKDROP_PATH, movie.getBackdropImage());
+                        values.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
+                        values.put(MovieContract.MovieEntry.COLUMN_USER_RATING, movie.getUserRating());
+                        values.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+
+                        getActivity().getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, values);
+                        Toast toast = Toast.makeText(getActivity(), "Added to Favourites", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
                 }
             }
         });
@@ -126,6 +169,7 @@ public class DetailActivityFragment extends Fragment {
             @Override
             public void onItemClick(LinearListView parent, View view, int position, long id) {
                 Trailer trailer = trailerAdapter.getItem(position);
+                TRAILER_KEY = trailer.getKey();
                 Intent trailerIntent = new Intent(Intent.ACTION_VIEW);
                 trailerIntent.setData(Uri.parse("http://www.youtube.com/watch?v="+trailer.getKey()));
                 startActivity(trailerIntent);
@@ -148,5 +192,4 @@ public class DetailActivityFragment extends Fragment {
         FetchReviewsTask reviewsTask = new FetchReviewsTask(reviewAdapter);
         reviewsTask.execute(Integer.toString(movie.getMovieId()));
     }
-
 }

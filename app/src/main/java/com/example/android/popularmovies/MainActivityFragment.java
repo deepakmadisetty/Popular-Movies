@@ -1,12 +1,11 @@
 package com.example.android.popularmovies;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -97,6 +96,7 @@ public class MainActivityFragment extends Fragment {
                 sortBy = RATING_DESC;
                 break;
             case R.id.action_sort_by_favourites:
+                FetchFavoriteMoviesTask();
                 break;
         }
         updateMovies(sortBy);
@@ -135,5 +135,25 @@ public class MainActivityFragment extends Fragment {
             }
         });
         return rootView;
+    }
+
+    private void FetchFavoriteMoviesTask()  {
+
+
+        Log.d("FavouriteTask", "Enter");
+            Cursor cursor = getContext().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI, null, null, null, null);
+            Log.d("FavouriteTask", String.valueOf(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE)));
+        List<Movie> results = new ArrayList<>();
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                Movie movie = new Movie(cursor);
+                    results.add(movie);
+                    movieAdapter = new MovieAdapter(getActivity(), results);
+                    movieAdapter.notifyDataSetChanged();
+                    gridView.setAdapter(movieAdapter);
+                }
+                cursor.close();
+
+            }
     }
 }

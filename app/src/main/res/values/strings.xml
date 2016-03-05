@@ -8,4 +8,6 @@
     <string name="overview">Plot Synopsis</string>
     <string name="trailers">Trailers :</string>
     <string name="reviews">Reviews :</string>
+    <string name="favourite">Mark as Favourite</string>
+    <string name="action_share">Share</string>
 </resources>

@@ -63,14 +63,11 @@
                     android:layout_gravity="left"
                     android:layout_margin="3dp"
                     android:id="@+id/da_release_date"/>
-
-                <CheckBox android:id="@+id/star"
+                <CheckBox android:id="@+id/favorite"
                     style="?android:attr/starStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mark as Favourite"
-                    android:onClick="onCheckboxClicked"
-                    />
+                    android:text="@string/favourite"/>
             </LinearLayout>
         </FrameLayout>
 
