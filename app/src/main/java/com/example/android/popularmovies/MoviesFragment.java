@@ -4,7 +4,6 @@ import android.database.Cursor;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,7 +33,7 @@ public class MoviesFragment extends Fragment {
     private static final String RATING_DESC = "vote_average.desc";
     private static String sortBy = POPULARITY_DESC;
 
-    private ArrayList<Movie> moviesList = new ArrayList<Movie>();
+    private static ArrayList<Movie> moviesList = new ArrayList<Movie>();
 
     public static final int COL_ID = 0;
     public static final int COL_MOVIE_ID = 1;
@@ -100,7 +99,7 @@ public class MoviesFragment extends Fragment {
 
     private void updateMovies(String sortBy) {
 
-        FetchMoviesTask moviesTask = new FetchMoviesTask(movieAdapter);
+        FetchMoviesTask moviesTask = new FetchMoviesTask(movieAdapter, getActivity(), MainActivity.mTwoPane);
         moviesTask.execute(sortBy);
     }
 
@@ -113,6 +112,8 @@ public class MoviesFragment extends Fragment {
         // Get a reference to the ListView, and attach this adapter to it.
         gridView = (GridView) rootView.findViewById(R.id.grid_view);
         gridView.setAdapter(movieAdapter);
+
+
 
         if(savedInstanceState != null && savedInstanceState.containsKey("movies") ) {
             moviesList = savedInstanceState.getParcelableArrayList("movies");

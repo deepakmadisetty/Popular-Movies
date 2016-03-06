@@ -2,6 +2,7 @@ package com.example.android.popularmovies;
 
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.example.android.popularmovies.adapters.MovieAdapter;
@@ -26,8 +27,13 @@ import java.util.List;
 public class FetchMoviesTask extends AsyncTask<String, Void, List<Movie>> {
 
     private MovieAdapter movieAdapter;
-    public FetchMoviesTask(MovieAdapter movieAdapter) {
+    private FragmentActivity mainActivity;
+    private boolean mTwoPane;
+
+    public FetchMoviesTask(MovieAdapter movieAdapter, FragmentActivity activity, boolean mTwoPane) {
         this.movieAdapter = movieAdapter;
+        this.mainActivity = activity;
+        this.mTwoPane = mTwoPane;
     }
 
     private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
@@ -164,6 +170,9 @@ public class FetchMoviesTask extends AsyncTask<String, Void, List<Movie>> {
         if (movies != null) {
             movieAdapter.clear();
             movieAdapter.addAll(movies);
+
+            if(mTwoPane)
+                ((MoviesFragment.Callback) mainActivity).onItemSelected(movies.get(0));
         }
     }
 }

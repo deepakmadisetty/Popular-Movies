@@ -11,7 +11,7 @@ import com.example.android.popularmovies.models.Movie;
 public class MainActivity extends AppCompatActivity implements MoviesFragment.Callback{
 
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
-    private boolean mTwoPane;
+    public static boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements MoviesFragment.Ca
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.movie_detail_container, fragment, DetailFragment.TAG)
                     .commit();
+
         } else {
             Intent intent = new Intent(this, DetailActivity.class)
                     .putExtra(DetailFragment.MOVIE_DETAIL, movie);

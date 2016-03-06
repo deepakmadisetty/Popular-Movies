@@ -73,20 +73,22 @@ public class DetailFragment extends Fragment {
             MenuItem menuShareItem = menu.findItem(R.id.action_share);
 
             mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuShareItem);
-
-            if (mShareActionProvider!= null) {
-                mShareActionProvider.setShareIntent(createShareMovieIntent());
-            }
+//            if (mShareActionProvider!= null) {
+//                mShareActionProvider.setShareIntent(createShareMovieIntent());
+//            }
         }
     }
 
-    private Intent createShareMovieIntent() {
+    public void createShareMovieIntent(Trailer trailer) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, movie.getMovieTitle() + " " +
-                TRAILER_URI + TRAILER_KEY);
-        return shareIntent;
+                TRAILER_URI + trailer.getKey());
+
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(shareIntent);
+        }
     }
 
     @Override
@@ -181,8 +183,9 @@ public class DetailFragment extends Fragment {
                 @Override
                 public void onItemClick(LinearListView parent, View view, int position, long id) {
                     trailer = trailerAdapter.getItem(position);
+                    TRAILER_KEY = trailer.getKey();
                     Intent trailerIntent = new Intent(Intent.ACTION_VIEW);
-                    trailerIntent.setData(Uri.parse( TRAILER_URI + trailer.getKey()));
+                    trailerIntent.setData(Uri.parse( TRAILER_URI + TRAILER_KEY));
                     startActivity(trailerIntent);
                 }
             });
@@ -197,7 +200,7 @@ public class DetailFragment extends Fragment {
     }
 
     private void updateTrailers() {
-        FetchTrailersTask trailersTask = new FetchTrailersTask(trailerAdapter);
+        FetchTrailersTask trailersTask = new FetchTrailersTask(trailerAdapter,this);
         trailersTask.execute(Integer.toString(movie.getMovieId()));
     }
 

@@ -3,6 +3,7 @@ package com.example.android.popularmovies;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ShareActionProvider;
 
 import com.example.android.popularmovies.adapters.TrailerAdapter;
 import com.example.android.popularmovies.models.Trailer;
@@ -26,9 +27,12 @@ import java.util.List;
 public class FetchTrailersTask extends AsyncTask<String, Void, List<Trailer>> {
 
     private TrailerAdapter trailerAdapter;
+    private DetailFragment detailFragment;
+    ShareActionProvider mShareActionProvider;
 
-    public FetchTrailersTask(TrailerAdapter trailerAdapter) {
+    public FetchTrailersTask(TrailerAdapter trailerAdapter, DetailFragment activity) {
         this.trailerAdapter = trailerAdapter;
+        detailFragment = activity;
     }
 
     private final String LOG_TAG = FetchTrailersTask.class.getSimpleName();
@@ -135,6 +139,7 @@ public class FetchTrailersTask extends AsyncTask<String, Void, List<Trailer>> {
         if (trailers != null) {
             trailerAdapter.clear();
             trailerAdapter.addAll(trailers);
+            detailFragment.createShareMovieIntent(trailers.get(0));
         }
     }
 }
