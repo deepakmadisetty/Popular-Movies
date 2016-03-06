@@ -1,6 +1,5 @@
 package com.example.android.popularmovies;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -68,6 +67,10 @@ public class MoviesFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+    public interface Callback {
+        void onItemSelected(Movie movie);
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList("movies", moviesList);
@@ -91,15 +94,16 @@ public class MoviesFragment extends Fragment {
         switch (id) {
             case R.id.action_sort_by_popularity:
                 sortBy = POPULARITY_DESC;
+                updateMovies(sortBy);
                 break;
             case R.id.action_sort_by_rating:
                 sortBy = RATING_DESC;
+                updateMovies(sortBy);
                 break;
             case R.id.action_sort_by_favourites:
-                FetchFavoriteMoviesTask();
+                FavoriteMoviesTask();
                 break;
         }
-        updateMovies(sortBy);
         return super.onOptionsItemSelected(item);
     }
 
@@ -130,14 +134,14 @@ public class MoviesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 Movie movie = movieAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra("movie", movie);
-                startActivity(intent);
+                ((Callback) getActivity()).onItemSelected(movie);
+
             }
         });
         return rootView;
     }
 
-    private void FetchFavoriteMoviesTask()  {
+    private void FavoriteMoviesTask()  {
 
 
         Log.d("FavouriteTask", "Enter");
@@ -153,7 +157,6 @@ public class MoviesFragment extends Fragment {
                     gridView.setAdapter(movieAdapter);
                 }
                 cursor.close();
-
             }
     }
 }
