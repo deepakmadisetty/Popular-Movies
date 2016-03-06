@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.example.android.popularmovies.adapters.MovieAdapter;
 import com.example.android.popularmovies.data.MovieContract;
@@ -31,19 +32,9 @@ public class MoviesFragment extends Fragment {
     private GridView gridView;
     private static final String POPULARITY_DESC = "popularity.desc";
     private static final String RATING_DESC = "vote_average.desc";
-    private ArrayList<Movie> moviesList = new ArrayList<Movie>();
     private static String sortBy = POPULARITY_DESC;
 
-    private static final String[] MOVIE_COLUMNS = {
-            MovieContract.MovieEntry._ID,
-            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
-            MovieContract.MovieEntry.COLUMN_MOVIE_TITLE,
-            MovieContract.MovieEntry.COLUMN_POSTER_PATH,
-            MovieContract.MovieEntry.COLUMN_BACKDROP_PATH,
-            MovieContract.MovieEntry.COLUMN_OVERVIEW,
-            MovieContract.MovieEntry.COLUMN_USER_RATING,
-            MovieContract.MovieEntry.COLUMN_RELEASE_DATE
-    };
+    private ArrayList<Movie> moviesList = new ArrayList<Movie>();
 
     public static final int COL_ID = 0;
     public static final int COL_MOVIE_ID = 1;
@@ -142,21 +133,22 @@ public class MoviesFragment extends Fragment {
     }
 
     private void FavoriteMoviesTask()  {
-
-
-        Log.d("FavouriteTask", "Enter");
-            Cursor cursor = getContext().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI, null, null, null, null);
-            Log.d("FavouriteTask", String.valueOf(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE)));
+        Cursor cursor = getContext().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI, null, null, null, null);
         List<Movie> results = new ArrayList<>();
-            if (cursor != null) {
-                while (cursor.moveToNext()) {
+
+        if (cursor.getCount() == 0) {
+            Toast toast = Toast.makeText(getActivity(), "No Favourites to show", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
                 Movie movie = new Movie(cursor);
-                    results.add(movie);
-                    movieAdapter = new MovieAdapter(getActivity(), results);
-                    movieAdapter.notifyDataSetChanged();
-                    gridView.setAdapter(movieAdapter);
-                }
-                cursor.close();
+                results.add(movie);
+                movieAdapter = new MovieAdapter(getActivity(), results);
+                movieAdapter.notifyDataSetChanged();
+                gridView.setAdapter(movieAdapter);
             }
+            cursor.close();
+        }
     }
 }
