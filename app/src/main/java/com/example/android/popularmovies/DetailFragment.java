@@ -87,13 +87,10 @@ public class DetailFragment extends Fragment {
         }
         View rootView =  inflater.inflate(R.layout.fragment_detail, container, false);
 
-        ScrollView detailLayout = (ScrollView) rootView.findViewById(R.id.detail_layout);
-
         ImageView posterImage = (ImageView) rootView.findViewById(R.id.da_poster_image);
         ImageView backdropImage = (ImageView) rootView.findViewById(R.id.da_backdrop_image);
 
         if(movie != null) {
-            detailLayout.setVisibility(View.VISIBLE);
             String backdropImageURL = "http://image.tmdb.org/t/p/w500/"+movie.getBackdropImage();
             String posterImageURL = "http://image.tmdb.org/t/p/w185/"+movie.getPosterImage();
 
@@ -116,14 +113,16 @@ public class DetailFragment extends Fragment {
 
 
             isFavourite = Utility.isFavorite(getActivity(), movie.getMovieId());
-            if(isFavourite == 1)
+            if(isFavourite == 1) {
                 checkBox.setChecked(true);
+                checkBox.setText("Remove from Favourites");
+            }
             checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
                     if (movie != null) {
-                       // int isFavourite = Utility.isFavorite(getActivity(), movie.getMovieId());
+                       int isFavourite = Utility.isFavorite(getActivity(), movie.getMovieId());
 
                         if (isFavourite == 1) {
                             getActivity().getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI,
@@ -132,6 +131,7 @@ public class DetailFragment extends Fragment {
                             );
                             Toast toast = Toast.makeText(getActivity(), "Removed from Favourites", Toast.LENGTH_SHORT);
                             toast.show();
+                            checkBox.setText("Mark as Favourite");
                         } else {
                             ContentValues values = new ContentValues();
                             values.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie.getMovieId());
@@ -143,8 +143,12 @@ public class DetailFragment extends Fragment {
                             values.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
 
                             getActivity().getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, values);
+
+                            checkBox.setText("Remove from Favourites");
+
                             Toast toast = Toast.makeText(getActivity(), "Added to Favourites", Toast.LENGTH_SHORT);
                             toast.show();
+
                         }
                     }
                 }
