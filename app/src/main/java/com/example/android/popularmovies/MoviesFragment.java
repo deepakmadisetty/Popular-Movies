@@ -151,5 +151,7 @@ public class MoviesFragment extends Fragment {
             }
             cursor.close();
         }
+        if(MainActivity.mTwoPane)
+            ((MoviesFragment.Callback) getActivity()).onItemSelected(moviesList.get(0));
     }
 }
