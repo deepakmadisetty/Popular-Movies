@@ -16,6 +16,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * Created by Deepak on 3/1/16.
  */
@@ -25,7 +28,6 @@ public class TrailerAdapter extends ArrayAdapter<Trailer> {
     private Context mContext;
 
     public TrailerAdapter(Context context, List<Trailer> trailers) {
-
         super(context, 0, trailers);
         mContext = context;
     }
@@ -33,22 +35,16 @@ public class TrailerAdapter extends ArrayAdapter<Trailer> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        // Gets the Movie object from the ArrayAdapter at the appropriate position
         Trailer trailer  = getItem(position);
 
-        // Adapters recycle views to AdapterViews.
-        // If this is a new View object we're getting, then inflate the layout.
-        // If not, this view already has the layout inflated from a previous call to getView,
-        // and we modify the View widgets as usual.
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(
                     R.layout.movie_trailer_item, parent, false);
+            ViewHolder viewHolder = new ViewHolder(convertView);
+            convertView.setTag(viewHolder);
         }
 
-        //ImageView iconView = (ImageView) convertView.findViewById(R.id.movie_image);
-
-        ImageView imageView = (ImageView) convertView.findViewById(R.id.trailer_image);
-        TextView textView = (TextView) convertView.findViewById(R.id.trailer_text);
+        ViewHolder viewHolder = (ViewHolder) convertView.getTag();
 
         String image_url = "http://img.youtube.com/vi/"+trailer.getKey()+ "/0.jpg";
 
@@ -56,9 +52,18 @@ public class TrailerAdapter extends ArrayAdapter<Trailer> {
                 .load(image_url)
                 .placeholder(R.drawable.poster_placeholder)
                 .error(R.drawable.error_poster_placeholder)
-                .into(imageView);
+                .into(viewHolder.trailerImageView);
 
-        textView.setText(trailer.getName());
+        viewHolder.trailerTextView.setText(trailer.getName());
         return convertView;
+    }
+
+    public static class ViewHolder {
+        @Bind(R.id.trailer_image) ImageView trailerImageView;
+        @Bind(R.id.trailer_text) TextView trailerTextView;
+
+        public ViewHolder(View view) {
+            ButterKnife.bind(this, view);
+        }
     }
 }

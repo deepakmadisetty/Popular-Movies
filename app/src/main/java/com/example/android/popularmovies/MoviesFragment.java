@@ -48,7 +48,6 @@ public class MoviesFragment extends Fragment {
     public void onStart() {
         super.onStart();
         // Tried updating the movies from here and onCreateView no change
-        updateMovies(sortBy);
     }
 
     @Override
@@ -99,7 +98,7 @@ public class MoviesFragment extends Fragment {
 
     private void updateMovies(String sortBy) {
 
-        FetchMoviesTask moviesTask = new FetchMoviesTask(movieAdapter, getActivity(), MainActivity.mTwoPane);
+        FetchMoviesTask moviesTask = new FetchMoviesTask(movieAdapter);
         moviesTask.execute(sortBy);
     }
 
@@ -112,8 +111,7 @@ public class MoviesFragment extends Fragment {
         // Get a reference to the ListView, and attach this adapter to it.
         gridView = (GridView) rootView.findViewById(R.id.grid_view);
         gridView.setAdapter(movieAdapter);
-
-
+        updateMovies(sortBy);
 
         if(savedInstanceState != null && savedInstanceState.containsKey("movies") ) {
             moviesList = savedInstanceState.getParcelableArrayList("movies");

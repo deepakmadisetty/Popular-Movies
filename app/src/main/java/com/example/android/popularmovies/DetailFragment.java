@@ -36,7 +36,7 @@ import butterknife.ButterKnife;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailFragment extends Fragment {
+public class DetailFragment extends Fragment implements AsyncResponse{
 
     public static final String MOVIE_DETAIL ="MOVIE_DETAIL";
     public static final String TRAILER_URI = "http://www.youtube.com/watch?v=";
@@ -50,7 +50,7 @@ public class DetailFragment extends Fragment {
     private ReviewAdapter reviewAdapter;
     private ArrayList<Trailer> trailerList = new ArrayList<Trailer>();
     private ArrayList<Review> reviewList = new ArrayList<Review>();
-    ShareActionProvider mShareActionProvider;
+    public ShareActionProvider mShareActionProvider;
 
     @Bind(R.id.da_movie_title) TextView movieTitle;
     @Bind(R.id.da_user_rating) TextView userRating;
@@ -73,22 +73,17 @@ public class DetailFragment extends Fragment {
             MenuItem menuShareItem = menu.findItem(R.id.action_share);
 
             mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuShareItem);
-//            if (mShareActionProvider!= null) {
-//                mShareActionProvider.setShareIntent(createShareMovieIntent());
-//            }
         }
     }
 
-    public void createShareMovieIntent(Trailer trailer) {
+    public Intent createShareMovieIntent() {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, movie.getMovieTitle() + " " +
-                TRAILER_URI + trailer.getKey());
+                TRAILER_URI + TRAILER_KEY);
 
-        if (mShareActionProvider != null) {
-            mShareActionProvider.setShareIntent(shareIntent);
-        }
+        return shareIntent;
     }
 
     @Override
@@ -178,14 +173,14 @@ public class DetailFragment extends Fragment {
             trailerListView.setAdapter(trailerAdapter);
             updateTrailers();
 
-            trailerListView.setOnItemClickListener(new LinearListView.OnItemClickListener(){
+            trailerListView.setOnItemClickListener(new LinearListView.OnItemClickListener() {
 
                 @Override
                 public void onItemClick(LinearListView parent, View view, int position, long id) {
                     trailer = trailerAdapter.getItem(position);
                     TRAILER_KEY = trailer.getKey();
                     Intent trailerIntent = new Intent(Intent.ACTION_VIEW);
-                    trailerIntent.setData(Uri.parse( TRAILER_URI + TRAILER_KEY));
+                    trailerIntent.setData(Uri.parse(TRAILER_URI + trailer.getKey()));
                     startActivity(trailerIntent);
                 }
             });
@@ -209,4 +204,11 @@ public class DetailFragment extends Fragment {
         reviewsTask.execute(Integer.toString(movie.getMovieId()));
     }
 
+    @Override
+    public void processFinish(Trailer trailer) {
+        TRAILER_KEY = trailer.getKey();
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(createShareMovieIntent());
+        }
+    }
 }
