@@ -46,6 +46,9 @@ public class TrailerAdapter extends ArrayAdapter<Trailer> {
 
         ViewHolder viewHolder = (ViewHolder) convertView.getTag();
 
+        if(trailer == null)
+            viewHolder.trailerTextView.setText("No Trailers to Show");
+
         String image_url = "http://img.youtube.com/vi/"+trailer.getKey()+ "/0.jpg";
 
         Picasso.with(mContext)

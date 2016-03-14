@@ -26,9 +26,13 @@ import java.util.List;
 public class FetchTrailersTask extends AsyncTask<String, Void, List<Trailer>> {
 
     private TrailerAdapter trailerAdapter;
+    public Trailer trailer;
 
-    public FetchTrailersTask(TrailerAdapter trailerAdapter) {
+    public AsyncResponse delegate;
+
+    public FetchTrailersTask(TrailerAdapter trailerAdapter, AsyncResponse delegate) {
         this.trailerAdapter = trailerAdapter;
+        this.delegate = delegate;
     }
 
     private final String LOG_TAG = FetchTrailersTask.class.getSimpleName();
@@ -132,9 +136,11 @@ public class FetchTrailersTask extends AsyncTask<String, Void, List<Trailer>> {
 
     @Override
     protected void onPostExecute(List<Trailer> trailers) {
-        if (trailers != null) {
+        if (trailers != null && trailers.size() != 0) {
             trailerAdapter.clear();
             trailerAdapter.addAll(trailers);
+            trailer = trailers.get(0);
+            delegate.processFinish(trailer);
         }
     }
 }
