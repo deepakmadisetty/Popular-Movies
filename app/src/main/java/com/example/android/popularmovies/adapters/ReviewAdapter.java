@@ -24,33 +24,38 @@ import butterknife.ButterKnife;
  */
 public class ReviewAdapter extends ArrayAdapter<Review> {
     private Context mContext;
-    @Bind(R.id.review_author) TextView reviewAuthor;
-    @Bind(R.id.review_content) TextView reviewContent;
 
     public ReviewAdapter(Context context, List<Review> reviews) {
-
         super(context, 0, reviews);
         mContext = context;
     }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        // Gets the Movie object from the ArrayAdapter at the appropriate position
         Review review  = getItem(position);
 
-        // Adapters recycle views to AdapterViews.
-        // If this is a new View object we're getting, then inflate the layout.
-        // If not, this view already has the layout inflated from a previous call to getView,
-        // and we modify the View widgets as usual.
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(
                     R.layout.movie_review_item, parent, false);
+            ViewHolder viewHolder = new ViewHolder(convertView);
+            convertView.setTag(viewHolder);
         }
 
-        ButterKnife.bind(this, convertView);
-        reviewAuthor.setText(review.getAuthor());
-        reviewContent.setText(review.getContent());
+        ViewHolder viewHolder = (ViewHolder) convertView.getTag();
+
+        viewHolder.reviewAuthor.setText(review.getAuthor());
+        viewHolder.reviewContent.setText(review.getContent());
         return convertView;
+    }
+
+    public static class ViewHolder {
+        @Bind(R.id.review_author) TextView reviewAuthor;
+        @Bind(R.id.review_content) TextView reviewContent;
+
+        public ViewHolder(View view) {
+            ButterKnife.bind(this, view);
+        }
     }
 }
 

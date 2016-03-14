@@ -27,12 +27,22 @@ import java.util.List;
 public class FetchTrailersTask extends AsyncTask<String, Void, List<Trailer>> {
 
     private TrailerAdapter trailerAdapter;
+<<<<<<< HEAD
     private DetailFragment detailFragment;
     ShareActionProvider mShareActionProvider;
 
     public FetchTrailersTask(TrailerAdapter trailerAdapter, DetailFragment activity) {
         this.trailerAdapter = trailerAdapter;
         detailFragment = activity;
+=======
+    public Trailer trailer;
+
+    public AsyncResponse delegate;
+
+    public FetchTrailersTask(TrailerAdapter trailerAdapter, AsyncResponse delegate) {
+        this.trailerAdapter = trailerAdapter;
+        this.delegate = delegate;
+>>>>>>> Popular-Movies-Branch
     }
 
     private final String LOG_TAG = FetchTrailersTask.class.getSimpleName();
@@ -136,10 +146,15 @@ public class FetchTrailersTask extends AsyncTask<String, Void, List<Trailer>> {
 
     @Override
     protected void onPostExecute(List<Trailer> trailers) {
-        if (trailers != null) {
+        if (trailers != null && trailers.size() != 0) {
             trailerAdapter.clear();
             trailerAdapter.addAll(trailers);
+<<<<<<< HEAD
             detailFragment.createShareMovieIntent(trailers.get(0));
+=======
+            trailer = trailers.get(0);
+            delegate.processFinish(trailer);
+>>>>>>> Popular-Movies-Branch
         }
     }
 }
